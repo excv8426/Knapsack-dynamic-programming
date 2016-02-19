@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bag {
-	public static int objects[][]={{5,4},{2,3},{6,5},{2,6},{4,6}};
+	public static int objects[][]={{2,6},{2,3},{6,5},{5,4},{4,6}};
 	public static Integer bagspace=10;
 	private static List<List<Status>> stas=new ArrayList<>();
 	private static List<Status> sta=null;
@@ -12,47 +12,47 @@ public class Bag {
 
 		for (int i = 0; i < objects.length; i++) {
 			sta=new ArrayList<>();			
+			//首个物体，有空间则放入。
 			if (i==0) {
 				for (int j = 0; j < bagspace+1; j++) {
 					s=new Status();
 					s.space=j;
 					s.putobject(i);
 					sta.add(s);
-					//System.out.println("ccc");
 				}
 			}else {
 				for (int j = 0; j < bagspace+1; j++) {
 					s=new Status();
-					s.space=j;
-					if (s.putobject(i)==0) {
+					//空间不足，必然不放入。
+					if (objects[i][0]>j) {
 						s.space=stas.get(i-1).get(j).space;
 						s.value=stas.get(i-1).get(j).value;
-						s.objectindexes.addAll(stas.get(i-1).get(j).objectindexes);
-						//System.out.println("ccc");
 					} else {
-						s.objectindexes.remove(0);
+						//物体i可以放入，但（物体i的价值+剩余空间放入前i-1个物体的价值）<所有空间用于放入前i-1个物体的价值，因此不放入物体i。
 						if (stas.get(i-1).get(j).value>=(stas.get(i-1).get(j-objects[i][0]).value+objects[i][1])) {
 							s.space=stas.get(i-1).get(j).space;
 							s.value=stas.get(i-1).get(j).value;
-							s.objectindexes.addAll(stas.get(i-1).get(j).objectindexes);
-							
 						} else {
 							s.space=j;
 							s.putobject(i);
-							for (int j2 = 0; j2 < stas.get(i-1).get(j-objects[i][0]).objectindexes.size(); j2++) {
-								
-								s.putobject(stas.get(i-1).get(j-objects[i][0]).objectindexes.get(j2));
-							}
+							s.space=s.space-stas.get(i-1).get(j-objects[i][0]).space;
+							s.value=s.value+stas.get(i-1).get(j-objects[i][0]).value;
 						}
-						
 					}
 					sta.add(s);
 				}
 			}
 			stas.add(sta);
 		}		
-		for (int i = 0; i < stas.get(4).get(10).objectindexes.size(); i++) {
-			System.out.println(stas.get(4).get(10).objectindexes.get(i));
+
+		int c=stas.get(0).size()-1;
+		int output=-1;
+		for (int i = objects.length-1; i > -1; i--) {
+			output=stas.get(i).get(c).lastput;
+			if (output!=-1) {
+				System.out.println(output);
+				c=c-objects[output][0];
+			}
 		}
 	}
 
